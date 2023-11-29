@@ -1,0 +1,30 @@
+{
+  "name": "dashboard-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "clean": "rimraf build:*",
+    "tsc": "tsc",
+    "dev":"npm run build && node build/main/server.js",
+    "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 build/main",
+    "build:main":"tsc -p tsconfig.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.2",
+    "dotenv": "^16.3.1",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.6.0",
+    "copyfiles": "^2.4.1",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.2.2"
+  }
+}

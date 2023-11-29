@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es2016",                                  
+    "lib": ["ES6"],                                        
+    "module": "commonjs",                              
+    "rootDir": "src", 
+    "outDir": "build/main",                                 
+    "moduleResolution": "node",
+    "declaration": true, 
+    "inlineSourceMap": true,   
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,           
+    "strict": true,                                      
+    "noUnusedLocals": true,                           
+    "noUnusedParameters": false,                                  
+    "noImplicitReturns": true,                       
+    "noFallthroughCasesInSwitch": true,               
+    "pretty": true,
+    "skipLibCheck": true
+  },
+  "include":["src/*.ts"],
+  "exclude": ["node_modules/**"],
+  "compileOnSave": false
+}
