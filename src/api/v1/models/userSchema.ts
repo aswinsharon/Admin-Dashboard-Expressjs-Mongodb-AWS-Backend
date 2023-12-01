@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { UserType } from "../interfaces/types/Types";
 
-const userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema<UserType>(
   {
     username: {
       type: String,
@@ -39,4 +40,5 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const User = mongoose.models.User || mongoose.model("User", userSchema); //checking weather the schema user is already present
+export const User: Model<UserType> =
+  mongoose.models.User || mongoose.model("User", userSchema); //checking weather the schema user is already present
