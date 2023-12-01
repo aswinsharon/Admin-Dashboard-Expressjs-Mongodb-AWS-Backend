@@ -1,4 +1,3 @@
-import { UserType } from "../interfaces/types/Types";
 import { User } from "../models/userSchema";
 
 const getAllUsers = async () => {
@@ -10,7 +9,7 @@ const getAllUsers = async () => {
   }
 };
 
-const addUser = async (newUserObject: UserType) => {
+const addUser = async (newUserObject: any) => {
   try {
     if (null !== newUserObject) {
       const reponseForAdd = await User.create(newUserObject);
@@ -20,10 +19,20 @@ const addUser = async (newUserObject: UserType) => {
       return null;
     }
   } catch (error: any) {
-    throw new Error(`Error Adding users: ${error.message}`);
+    throw new Error(`Error Adding user: ${error.message}`);
+  }
+};
+
+const deleteUser = async (Id: string) => {
+  try {
+    const responseForDelete = await User.findByIdAndDelete(Id);
+    return responseForDelete;
+  } catch (error: any) {
+    throw new Error(`Error deleting user: ${error.message}`);
   }
 };
 export default {
   getAllUsers,
   addUser,
+  deleteUser,
 };
