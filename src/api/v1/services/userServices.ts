@@ -1,8 +1,9 @@
+import { UserRenderType } from "../interfaces/types/Types";
 import { User } from "../models/userSchema";
 
-const getAllUsers = async () => {
+const getAllUsers = async (): Promise<UserRenderType[]> => {
   try {
-    const users = await User.find();
+    const users = (await User.find().select("-password")) as UserRenderType[];
     return users;
   } catch (error: any) {
     throw new Error(`Error fetching users: ${error.message}`);
@@ -19,7 +20,8 @@ const addUser = async (newUserObject: any) => {
       return null;
     }
   } catch (error: any) {
-    throw new Error(`Error Adding user: ${error.message}`);
+    console.log(error.message);
+    return null;
   }
 };
 
