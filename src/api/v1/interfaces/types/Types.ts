@@ -11,3 +11,15 @@ export interface UserType extends Document {
   phone: string;
   address: string;
 }
+
+export interface UserRenderType {
+  _id: string;
+  username: string;
+  email: string;
+  img?: string;
+  isActive: boolean;
+  isAdmin: boolean;
+  phone: string;
+  address: string;
+  createdAt: Date;
+}

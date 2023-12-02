@@ -1,10 +1,26 @@
 import { Request, Response } from "express";
 import userServices from "../services/userServices";
 
+import { UserRenderType } from "../interfaces/types/Types";
+
 const getUsers = async (_req: Request, res: Response) => {
   try {
-    const users = await userServices.getAllUsers();
-    res.status(200).json(users);
+    const usersFromDB = await userServices.getAllUsers();
+    if (null !== usersFromDB) {
+      const mappedUsers = usersFromDB.map((user: UserRenderType) => ({
+        _id: user?._id,
+        username: user?.username,
+        email: user?.email,
+        img: user?.img,
+        isActive: user?.isActive,
+        isAdmin: user?.isAdmin,
+        phone: user?.phone,
+        address: user?.address,
+      }));
+      res.status(200).json(mappedUsers);
+    } else {
+      res.status(200).json([]);
+    }
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -46,7 +62,6 @@ const createUser = async (req: Request, res: Response) => {
         userInsertionObject.address = newUserObject.address;
         userInsertionObject.phone = newUserObject.phone;
         userInsertionObject.img = newUserObject.img;
-        console.log(userInsertionObject);
 
         const user = await userServices.addUser(userInsertionObject);
         res
