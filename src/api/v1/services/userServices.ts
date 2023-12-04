@@ -1,7 +1,7 @@
 import { UserRenderType } from "../interfaces/types/Types";
 import { User } from "../models/userSchema";
 
-const getAllUsers = async (): Promise<UserRenderType[]> => {
+const getAllUsersService = async (): Promise<UserRenderType[]> => {
   try {
     const users = (await User.find().select("-password")) as UserRenderType[];
     return users;
@@ -10,7 +10,7 @@ const getAllUsers = async (): Promise<UserRenderType[]> => {
   }
 };
 
-const addUser = async (newUserObject: any) => {
+const addUserService = async (newUserObject: any) => {
   try {
     if (null !== newUserObject) {
       const reponseForAdd = await User.create(newUserObject);
@@ -25,7 +25,7 @@ const addUser = async (newUserObject: any) => {
   }
 };
 
-const deleteUser = async (Id: string) => {
+const deleteUserService = async (Id: string) => {
   try {
     const responseForDelete = await User.findByIdAndDelete(Id);
     return responseForDelete;
@@ -34,7 +34,7 @@ const deleteUser = async (Id: string) => {
   }
 };
 export default {
-  getAllUsers,
-  addUser,
-  deleteUser,
+  getAllUsersService,
+  addUserService,
+  deleteUserService,
 };
