@@ -7,8 +7,10 @@
     "clean": "rimraf build:*",
     "tsc": "tsc",
     "dev": "npm run build && node build/main/server.js",
+    "start":"npm run build && node build/main/server.js",
     "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 build/main",
-    "build:main": "tsc -p tsconfig.json"
+    "build:main": "tsc -p tsconfig.json",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",

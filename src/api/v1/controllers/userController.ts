@@ -44,7 +44,7 @@ const createUser = async (req: Request, res: Response) => {
     message: "",
   };
   try {
-    let newUserObject = req?.body;
+    let newUserObject = req.body;
     let userInsertionObject = {
       username: "",
       email: "",
@@ -76,12 +76,12 @@ const createUser = async (req: Request, res: Response) => {
       if (existingUser) {
         errorMessage.message = "Username or email is already taken";
         errorMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
-        return res.json(errorMessage);
+        return res.status(400).json(errorMessage);
       }
-      if (newUserObject.isAdmin === "yes") {
+      if (newUserObject?.isAdmin === "yes") {
         userInsertionObject.isAdmin = true;
       }
-      if (newUserObject.active === "yes") {
+      if (newUserObject?.isActive === "yes") {
         userInsertionObject.isActive = true;
       }
 
@@ -89,16 +89,13 @@ const createUser = async (req: Request, res: Response) => {
       createUserResponseMessage.statusCode = Constants.HTTP_CREATED_STATUS_CODE;
       createUserResponseMessage.message = "User Created Successfully";
       createUserResponseMessage.userDetails = user;
-      console.log(user);
       return res.status(201).json(createUserResponseMessage);
     } else {
-      console.log("Invalid fields");
       errorMessage.message = "Invalid Request";
       errorMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
       return res.status(400).json(errorMessage);
     }
   } catch (error) {
-    console.error("Error creating user:", error);
     errorMessage.message = "Internal Server Error";
     errorMessage.statusCode = Constants.HTTP_SERVER_ERROR_STATUS_CODE;
     return res.status(500).json(errorMessage);
