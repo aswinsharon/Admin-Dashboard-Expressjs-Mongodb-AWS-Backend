@@ -29,8 +29,16 @@ function validateNewUserObjectValues(newUserObject: any): boolean {
       validator: (value: any) =>
         typeof value === "string" && /\S+@\S+\.\S+/.test(value),
     },
-    { name: "isAdmin", validator: (value: any) => typeof value === "boolean" },
-    { name: "isActive", validator: (value: any) => typeof value === "boolean" },
+    {
+      name: "isAdmin",
+      validator: (value: any) =>
+        typeof value === "string" && (value === "yes" || value === "no"),
+    },
+    {
+      name: "isActive",
+      validator: (value: any) =>
+        typeof value === "string" && (value === "yes" || value === "no"),
+    },
     {
       name: "password",
       validator: (value: any) => typeof value === "string" && value.length >= 8,
