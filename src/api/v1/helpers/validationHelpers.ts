@@ -1,8 +1,19 @@
+/**
+ *
+ * @param {string} userId
+ * @returns {boolean}
+ */
+
 function validateUserId(userId: string) {
   const pattern = /^[0-9a-fA-F]{24}$/;
   return pattern.test(userId);
 }
 
+/**
+ *
+ * @param {object} newUserObject
+ * @returns {boolean}
+ */
 function validateNewUserObjectFields(newUserObject: any): boolean {
   const requiredFields = [
     "username",

@@ -6,8 +6,8 @@
   "scripts": {
     "clean": "rimraf build:*",
     "tsc": "tsc",
-    "dev": "npm run build && node build/main/server.js",
-    "start":"npm run build && node build/main/server.js",
+    "dev": "npm run build && node build/main/index.js",
+    "start": "npm run build && node build/main/index.js",
     "build": "npm-run-all clean && run-p build:* && copyfiles -u 1 build/main",
     "build:main": "tsc -p tsconfig.json",
     "test": "jest"
@@ -20,7 +20,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mongoose": "^8.0.2",
-    "rimraf": "^5.0.1"
+    "rimraf": "^5.0.1",
+    "serverless-http": "^3.2.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
