@@ -1,7 +1,7 @@
 const finnhub = require("finnhub");
 
 const api_key = finnhub.ApiClient.instance.authentications["api_key"];
-api_key.apiKey = "cm17kahr01qk0g5flqu0cm17kahr01qk0g5flqug";
+api_key.apiKey = "";
 const finnhubClient = new finnhub.DefaultApi();
 
 function getStocks() {
