@@ -1,11 +1,15 @@
 import express from "express";
 import serverless from "serverless-http";
 import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import databaseConfig from "./config/DatabaseConfig";
-import userRoutes from "./api/v1/routes/userRouter";
+import router from "./api/v1/routes/router";
 
 const app = express();
-const PORT = 8081;
+const PORT = 8080;
 
 //middlewares
 app.use(express.json());
@@ -13,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 //routes
-app.use("/api/v1", userRoutes);
+app.use("/api/v1", router);
 
 databaseConfig.on("connected", (_dbConnection) => {
   console.log("Event received: MongoDB connected successfully!");
@@ -36,6 +40,8 @@ process.on("SIGINT", async () => {
   process.exit();
 });
 
-startServer();
+(async () => {
+  await startServer();
+})();
 
 exports.handler = serverless(app);

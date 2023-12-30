@@ -23,3 +23,8 @@ export interface UserRenderType {
   address: string;
   createdAt: Date;
 }
+
+export interface validationObject {
+  isValid: boolean;
+  invalidFields: string[];
+}
