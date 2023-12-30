@@ -19,7 +19,7 @@
     "pretty": true,
     "skipLibCheck": true
   },
-  "include":["src/**/*.ts"],
+  "include":["src/**/*.ts","src/**/*.d.ts", "src/api/v1/services/stockServices.js", "src/config/Loggers.js"],
   "exclude": ["node_modules/**"],
   "compileOnSave": false
 }

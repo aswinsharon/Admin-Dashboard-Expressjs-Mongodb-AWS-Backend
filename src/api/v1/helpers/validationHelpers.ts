@@ -1,3 +1,5 @@
+import { validationObject } from "../interfaces/types/Types";
+
 /**
  *
  * @param {string} userId
@@ -26,10 +28,22 @@ function validateNewUserObjectFields(newUserObject: any): boolean {
     "img",
   ];
   const isValid = requiredFields.every((field) => newUserObject[field]);
+  console.log("valid in fields", isValid);
   return isValid;
 }
 
-function validateNewUserObjectValues(newUserObject: any): boolean {
+/**
+ *
+ * @param {object} newUserObject
+ * @returns {boolean}
+ */
+
+function validateNewUserObjectValues(newUserObject: any): validationObject {
+  let invalidFields: string[] = [];
+  let validationObject: validationObject = {
+    isValid: false,
+    invalidFields: [],
+  };
   const requiredFields = [
     {
       name: "username",
@@ -61,18 +75,27 @@ function validateNewUserObjectValues(newUserObject: any): boolean {
     {
       name: "phone",
       validator: (value: any) =>
-        typeof value === "string" && /^\d{3}-\d{3}-\d{4}$/.test(value),
+        typeof value === "string" && /^\d{10}$/.test(value),
     },
     {
       name: "img",
       validator: (value: any) => typeof value === "string" && value.length > 0,
     },
   ];
-  const isValid = requiredFields.every(({ name, validator }) =>
-    validator(newUserObject[name])
-  );
-  return isValid;
+  requiredFields.forEach(({ name, validator }) => {
+    if (!validator(newUserObject[name])) {
+      invalidFields.push(name);
+    }
+  });
+  if (invalidFields.length) {
+    validationObject.isValid = false;
+    validationObject.invalidFields = invalidFields;
+  } else {
+    validationObject.isValid = true;
+  }
+  return validationObject;
 }
+
 export {
   validateUserId,
   validateNewUserObjectFields,

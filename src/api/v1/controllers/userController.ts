@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import bcrypt from "bcryptjs";
 import userServices from "../services/userServices";
 
 import { UserRenderType } from "../interfaces/types/Types";
@@ -13,6 +14,7 @@ import { Constants } from "../../../config/constants";
 const getUsers = async (_req: Request, res: Response) => {
   try {
     const usersFromDB = await userServices.getAllUsersService();
+    console.log(usersFromDB);
     if (null !== usersFromDB) {
       const mappedUsers = usersFromDB.map((user: UserRenderType) => ({
         _id: user?._id,
@@ -24,12 +26,14 @@ const getUsers = async (_req: Request, res: Response) => {
         phone: user?.phone,
         address: user?.address,
       }));
-      res.status(200).json(mappedUsers);
+      return res.status(Constants.HTTP_OK_STATUS_CODE).json(mappedUsers);
     } else {
-      res.status(200).json([]);
+      return res.status(Constants.HTTP_OK_STATUS_CODE).json([]);
     }
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    return res
+      .status(Constants.HTTP_SERVER_ERROR_STATUS_CODE)
+      .json({ error: error.message });
   }
 };
 
@@ -42,63 +46,78 @@ const createUser = async (req: Request, res: Response) => {
   let errorMessage = {
     statusCode: 0,
     message: "",
+    invalidFields: [] as string[],
+  };
+  let userInsertionObject = {
+    username: "",
+    email: "",
+    img: "",
+    phone: "",
+    password: "",
+    address: "",
+    isAdmin: false,
+    isActive: false,
   };
   try {
     let newUserObject = req.body;
-    let userInsertionObject = {
-      username: "",
-      email: "",
-      img: "",
-      phone: "",
-      password: "",
-      address: "",
-      isAdmin: false,
-      isActive: false,
-    };
-
+    console.log("newuserobj", req.body);
     if (
       validateNewUserObjectFields(newUserObject) &&
-      validateNewUserObjectValues(newUserObject)
+      validateNewUserObjectValues(newUserObject)?.isValid
     ) {
-      userInsertionObject.username = newUserObject.username;
-      userInsertionObject.password = newUserObject.password;
-      userInsertionObject.email = newUserObject.email;
-      userInsertionObject.address = newUserObject.address;
-      userInsertionObject.phone = newUserObject.phone;
-      userInsertionObject.img = newUserObject.img;
+      console.log("under create condition");
 
       const existingUser = await User.findOne({
         $or: [
-          { username: userInsertionObject.username },
-          { email: userInsertionObject.email },
+          { username: newUserObject.username },
+          { email: newUserObject.email },
         ],
       });
+
       if (existingUser) {
         errorMessage.message = "Username or email is already taken";
-        errorMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
-        return res.status(400).json(errorMessage);
-      }
-      if (newUserObject?.isAdmin === "yes") {
-        userInsertionObject.isAdmin = true;
-      }
-      if (newUserObject?.isActive === "yes") {
-        userInsertionObject.isActive = true;
-      }
+        errorMessage.statusCode = 409;
+        return res.status(409).json(errorMessage);
+      } else {
+        const hashedPassword = await bcrypt.hash(newUserObject.password, 10);
+        userInsertionObject.username = newUserObject.username;
+        userInsertionObject.password = hashedPassword;
+        userInsertionObject.email = newUserObject.email;
+        userInsertionObject.address = newUserObject.address;
+        userInsertionObject.phone = newUserObject.phone;
+        userInsertionObject.img = newUserObject.img;
+        if (newUserObject?.isAdmin === "yes") {
+          userInsertionObject.isAdmin = true;
+        }
+        if (newUserObject?.isActive === "yes") {
+          userInsertionObject.isActive = true;
+        }
 
-      const user = await userServices.addUserService(userInsertionObject);
-      createUserResponseMessage.statusCode = Constants.HTTP_CREATED_STATUS_CODE;
-      createUserResponseMessage.message = "User Created Successfully";
-      createUserResponseMessage.userDetails = user;
-      return res.status(201).json(createUserResponseMessage);
+        const user = await userServices.addUserService(userInsertionObject);
+        createUserResponseMessage.statusCode =
+          Constants.HTTP_CREATED_STATUS_CODE;
+        createUserResponseMessage.message = "User Created Successfully";
+        createUserResponseMessage.userDetails = user;
+        return res
+          .status(Constants.HTTP_CREATED_STATUS_CODE)
+          .json(createUserResponseMessage);
+      }
     } else {
       errorMessage.message = "Invalid Request";
       errorMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
-      return res.status(400).json(errorMessage);
+      errorMessage.invalidFields =
+        validateNewUserObjectValues(newUserObject).invalidFields;
+      return res
+        .status(Constants.HTTP_BAD_REQUEST_STATUS_CODE)
+        .json(errorMessage);
     }
   } catch (error) {
+    console.log("under catch");
     errorMessage.message = "Internal Server Error";
     errorMessage.statusCode = Constants.HTTP_SERVER_ERROR_STATUS_CODE;
-    return res.status(500).json(errorMessage);
+    return res
+      .status(Constants.HTTP_SERVER_ERROR_STATUS_CODE)
+      .json(errorMessage);
   }
 };
 
