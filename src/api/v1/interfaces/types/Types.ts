@@ -28,3 +28,9 @@ export interface validationObject {
   isValid: boolean;
   invalidFields: string[];
 }
+
+export interface UserAuthType {
+  id: string;
+  username: string;
+  password: string;
+}

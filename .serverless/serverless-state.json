@@ -195,7 +195,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/users-api/dev/1703960142369-2023-12-30T18:15:42.369Z/users-api.zip"
+                "S3Key": "serverless/users-api/dev/1703961751673-2023-12-30T18:42:31.673Z/users-api.zip"
               },
               "Handler": "build/main/index.handler",
               "Runtime": "nodejs18.x",
@@ -213,14 +213,14 @@
               "HelloLogGroup"
             ]
           },
-          "HelloLambdaVersion7nW3Bn3bGFtv1NDe1AyM11aAMlVK3lCT8gcUQzqo4": {
+          "HelloLambdaVersionVm2CPuhKdGo3mAsW97kOMwhRaSi310QikbfPSb6Lc": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "HelloLambdaFunction"
               },
-              "CodeSha256": "rjihJk9ysycaQDvzG7KjWYXOUhotIKvC2A6m9DMVa7Y="
+              "CodeSha256": "naKwf7f2oQbz90bqE9eLjj9IBaoEyUk4Vrp4uhPxwlI="
             }
           },
           "HttpApi": {
@@ -349,7 +349,7 @@
           "HelloLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "HelloLambdaVersion7nW3Bn3bGFtv1NDe1AyM11aAMlVK3lCT8gcUQzqo4"
+              "Ref": "HelloLambdaVersionVm2CPuhKdGo3mAsW97kOMwhRaSi310QikbfPSb6Lc"
             },
             "Export": {
               "Name": "sls-users-api-dev-HelloLambdaFunctionQualifiedArn"
@@ -503,7 +503,7 @@
         "timeout": 20,
         "runtime": "nodejs18.x",
         "vpc": {},
-        "versionLogicalId": "HelloLambdaVersion7nW3Bn3bGFtv1NDe1AyM11aAMlVK3lCT8gcUQzqo4"
+        "versionLogicalId": "HelloLambdaVersionVm2CPuhKdGo3mAsW97kOMwhRaSi310QikbfPSb6Lc"
       }
     },
     "configValidationMode": "warn",
@@ -523,7 +523,7 @@
     "artifact": "/Users/aswinsharon/Desktop/React/dashboard-backend/.serverless/users-api.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/users-api/dev/1703960142369-2023-12-30T18:15:42.369Z",
+    "artifactDirectoryName": "serverless/users-api/dev/1703961751673-2023-12-30T18:42:31.673Z",
     "artifact": "users-api.zip"
   }
 }

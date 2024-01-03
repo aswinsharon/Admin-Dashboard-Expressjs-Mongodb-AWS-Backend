@@ -25,10 +25,14 @@ const addUserService = async (newUserObject: any) => {
   }
 };
 
-const deleteUserService = async (Id: string) => {
+const deleteUserService = async (id: string) => {
   try {
-    const responseForDelete = await User.findByIdAndDelete(Id);
-    return responseForDelete;
+    if (null !== id || undefined !== id) {
+      const responseForDelete = await User.findByIdAndDelete(id);
+      return responseForDelete;
+    } else {
+      throw new Error("Id is empty");
+    }
   } catch (error: any) {
     throw new Error(`Error deleting user: ${error.message}`);
   }

@@ -76,8 +76,10 @@ const createUser = async (req: Request, res: Response) => {
 
       if (existingUser) {
         errorMessage.message = "Username or email is already taken";
-        errorMessage.statusCode = 409;
-        return res.status(409).json(errorMessage);
+        errorMessage.statusCode = Constants.HTTP_CONFLICT_STATUS_CODE;
+        return res
+          .status(Constants.HTTP_CONFLICT_STATUS_CODE)
+          .json(errorMessage);
       } else {
         const hashedPassword = await bcrypt.hash(newUserObject.password, 10);
         userInsertionObject.username = newUserObject.username;
@@ -92,7 +94,6 @@ const createUser = async (req: Request, res: Response) => {
         if (newUserObject?.isActive === "yes") {
           userInsertionObject.isActive = true;
         }
-
         const user = await userServices.addUserService(userInsertionObject);
         createUserResponseMessage.statusCode =
           Constants.HTTP_CREATED_STATUS_CODE;

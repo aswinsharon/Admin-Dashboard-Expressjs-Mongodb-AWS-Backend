@@ -7,6 +7,7 @@ export abstract class Constants {
   static readonly HTTP_UNAUTHORIZED_STATUS_CODE = 401;
   static readonly HTTP_NOT_FOUND_STATUS_CODE = 404;
   static readonly HTTP_SERVER_ERROR_STATUS_CODE = 500;
+  static readonly HTTP_CONFLICT_STATUS_CODE = 409;
 
   //messages
 }
