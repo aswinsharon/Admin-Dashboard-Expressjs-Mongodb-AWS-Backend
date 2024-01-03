@@ -10,3 +10,4 @@ package-lock.json
 # production
 /build
 
+.serverless/

@@ -4,7 +4,7 @@ const MONGO_URI = process.env.MONGO_URI as string;
 
 class DatabaseConfig extends EventEmitter {
   RETRY_COUNT = 0;
-  MAX_COUNT = 2;
+  MAX_COUNT = 3;
 
   private dbConnection: Connection | null = null;
 
@@ -18,7 +18,7 @@ class DatabaseConfig extends EventEmitter {
       this.dbConnection = mongoose.connection;
       this.emit("connected", this.dbConnection);
     } catch (exception: any) {
-      if (this.RETRY_COUNT <= this.MAX_COUNT) {
+      if (this.RETRY_COUNT < this.MAX_COUNT) {
         console.error("connection unsucessful, retrying...", exception);
         await new Promise((resolve) => setTimeout(resolve, 2000));
         await this.connect();
