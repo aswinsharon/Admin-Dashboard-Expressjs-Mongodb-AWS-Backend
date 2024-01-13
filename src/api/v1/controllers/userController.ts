@@ -1,13 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import userServices from "../services/userServices";
-
 import { UserRenderType } from "../interfaces/types/Types";
-import {
-  validateUserId,
-  validateNewUserObjectFields,
-  validateNewUserObjectValues,
-} from "../helpers/validationHelpers";
+import { validateUserId, validateNewUserObjectFields, validateNewUserObjectValues, } from "../helpers/validationHelpers";
 import { User } from "../models/userSchema";
 import { Constants } from "../../../config/constants";
 
@@ -60,20 +55,8 @@ const createUser = async (req: Request, res: Response) => {
   };
   try {
     let newUserObject = req.body;
-    console.log("newuserobj", req.body);
-    if (
-      validateNewUserObjectFields(newUserObject) &&
-      validateNewUserObjectValues(newUserObject)?.isValid
-    ) {
-      console.log("under create condition");
-
-      const existingUser = await User.findOne({
-        $or: [
-          { username: newUserObject.username },
-          { email: newUserObject.email },
-        ],
-      });
-
+    if (validateNewUserObjectFields(newUserObject) && validateNewUserObjectValues(newUserObject)?.isValid) {
+      const existingUser = await User.findOne({ $or: [{ username: newUserObject.username }, { email: newUserObject.email },], });
       if (existingUser) {
         errorMessage.message = "Username or email is already taken";
         errorMessage.statusCode = Constants.HTTP_CONFLICT_STATUS_CODE;
