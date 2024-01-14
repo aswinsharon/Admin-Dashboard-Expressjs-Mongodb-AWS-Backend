@@ -11,7 +11,7 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
   if (!token) {
     authenticationResponse.statusCode = Constants.HTTP_UNAUTHORIZED_STATUS_CODE;
     authenticationResponse.message = "Access denied";
-    res.status(Constants.HTTP_UNAUTHORIZED_STATUS_CODE).send(authenticationResponse);
+    res.status(Constants.HTTP_UNAUTHORIZED_STATUS_CODE).json(authenticationResponse);
     return;
   }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (error, userId) => {
@@ -19,7 +19,7 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
       console.log("error", error);
       authenticationResponse.statusCode = Constants.HTTP_FORBIDDEN_STATUS_CODE;
       authenticationResponse.message = "Invalid Token";
-      res.status(Constants.HTTP_FORBIDDEN_STATUS_CODE).send(authenticationResponse);
+      res.status(Constants.HTTP_FORBIDDEN_STATUS_CODE).json(authenticationResponse);
       return;
     } else {
       req.user = userId;
