@@ -6,11 +6,21 @@ import { validateUserId, validateNewUserObjectFields, validateNewUserObjectValue
 import { User } from "../models/userSchema";
 import { Constants } from "../../../config/constants";
 
-const getUsers = async (_req: Request, res: Response) => {
+/**
+ * Retrieves all users from the database.
+ * @param {Request} _req - Express request object (unused).
+ * @param {Response} res - Express response object.
+ * @returns {Promise<Response<any, Record<string, any>>>} Promise representing the result of the operation.
+ */
+const getUsers = async (_req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
   try {
+    // Retrieve all users from the database.
     const usersFromDB = await userServices.getAllUsersService();
     console.log(usersFromDB);
+
+    // Check if users are present in the database.
     if (null !== usersFromDB) {
+      // Map user data to a simplified format.
       const mappedUsers = usersFromDB.map((user: UserRenderType) => ({
         _id: user?._id,
         username: user?.username,
@@ -23,12 +33,12 @@ const getUsers = async (_req: Request, res: Response) => {
       }));
       return res.status(Constants.HTTP_OK_STATUS_CODE).json(mappedUsers);
     } else {
+      // Return an empty array if no users are found.
       return res.status(Constants.HTTP_OK_STATUS_CODE).json([]);
     }
   } catch (error: any) {
-    return res
-      .status(Constants.HTTP_SERVER_ERROR_STATUS_CODE)
-      .json({ error: error.message });
+    // Handle errors and return an appropriate response.
+    return res.status(Constants.HTTP_SERVER_ERROR_STATUS_CODE).json({ error: error.message });
   }
 };
 
@@ -60,9 +70,7 @@ const createUser = async (req: Request, res: Response) => {
       if (existingUser) {
         errorMessage.message = "Username or email is already taken";
         errorMessage.statusCode = Constants.HTTP_CONFLICT_STATUS_CODE;
-        return res
-          .status(Constants.HTTP_CONFLICT_STATUS_CODE)
-          .json(errorMessage);
+        return res.status(Constants.HTTP_CONFLICT_STATUS_CODE).json(errorMessage);
       } else {
         const hashedPassword = await bcrypt.hash(newUserObject.password, 10);
         userInsertionObject.username = newUserObject.username;
@@ -78,30 +86,22 @@ const createUser = async (req: Request, res: Response) => {
           userInsertionObject.isActive = true;
         }
         const user = await userServices.addUserService(userInsertionObject);
-        createUserResponseMessage.statusCode =
-          Constants.HTTP_CREATED_STATUS_CODE;
+        createUserResponseMessage.statusCode = Constants.HTTP_CREATED_STATUS_CODE;
         createUserResponseMessage.message = "User Created Successfully";
         createUserResponseMessage.userDetails = user;
-        return res
-          .status(Constants.HTTP_CREATED_STATUS_CODE)
-          .json(createUserResponseMessage);
+        return res.status(Constants.HTTP_CREATED_STATUS_CODE).json(createUserResponseMessage);
       }
     } else {
       errorMessage.message = "Invalid Request";
       errorMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
-      errorMessage.invalidFields =
-        validateNewUserObjectValues(newUserObject).invalidFields;
-      return res
-        .status(Constants.HTTP_BAD_REQUEST_STATUS_CODE)
-        .json(errorMessage);
+      errorMessage.invalidFields = validateNewUserObjectValues(newUserObject).invalidFields;
+      return res.status(Constants.HTTP_BAD_REQUEST_STATUS_CODE).json(errorMessage);
     }
   } catch (error) {
     console.log("under catch");
     errorMessage.message = "Internal Server Error";
     errorMessage.statusCode = Constants.HTTP_SERVER_ERROR_STATUS_CODE;
-    return res
-      .status(Constants.HTTP_SERVER_ERROR_STATUS_CODE)
-      .json(errorMessage);
+    return res.status(Constants.HTTP_SERVER_ERROR_STATUS_CODE).json(errorMessage);
   }
 };
 

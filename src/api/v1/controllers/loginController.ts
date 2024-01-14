@@ -6,6 +6,7 @@ import { generateAccessToken, generateRefreshToken } from "../helpers/commonUtil
 import { User } from "../models/userSchema";
 import { Constants } from "../../../config/constants";
 import { AuthResponse } from "../models/authResponse";
+import logger from "../../../config/Loggers";
 
 const users: UserAuthType[] = [];
 
@@ -32,34 +33,63 @@ const register = (req: Request, res: Response): void => {
   }
 };
 
-const login = async (req: Request, res: Response): Promise<void> => {
+/**
+ * Handles user login.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * @returns {Promise<Response<any, Record<string, any>>>} Promise representing the result of the operation.
+ */
+const login = async (req: Request, res: Response) => {
   let foundUser: UserType | null;
   let response;
   const { username, password } = req.body;
+
   try {
+    // Find the user in the database based on the provided username.
     foundUser = await User.findOne({ username: username });
-    if (foundUser && foundUser.username && foundUser.password) {
+
+    if (foundUser && foundUser?.username && foundUser?.password) {
+      // Check if the provided password matches the stored hashed password.
       if (bcrypt.compareSync(password, foundUser.password)) {
+        // Generate access and refresh tokens upon successful authentication.
         const accessToken = generateAccessToken(foundUser._id);
         const refreshToken = generateRefreshToken(foundUser._id);
-        response = new AuthResponse(Constants.HTTP_OK_STATUS_CODE, "AUTHORIZED", "User authorized successfully", accessToken, refreshToken);
-        res.status(200).json(response);
-        return;
+
+        // Create an AuthResponse with success details.
+        response = new AuthResponse(
+          Constants.HTTP_OK_STATUS_CODE,
+          Constants.AUTHORIZED,
+          Constants.SUCCESS_MSG_AUTHORIZED_SUCCESSFULLY,
+          accessToken,
+          refreshToken
+        );
       } else {
-        response = new AuthResponse(Constants.HTTP_UNAUTHORIZED_STATUS_CODE, "UNAUTHORIZED", "Unauthorized user");
-        res.status(401).json(response);
-        return;
+        // Return unauthorized response if the passwords don't match.
+        response = new AuthResponse(
+          Constants.HTTP_UNAUTHORIZED_STATUS_CODE,
+          Constants.UNAUTHORIZED,
+          Constants.ERROR_MSG_UNAUTHORIZED_USER
+        );
       }
     } else {
-      response = new AuthResponse(Constants.HTTP_FORBIDDEN_STATUS_CODE, "FORBIDDEN", "User not found or forbidden");
-      res.status(403).json(response);
-      return;
+      // Return forbidden response if the user is not found in the database.
+      response = new AuthResponse(
+        Constants.HTTP_FORBIDDEN_STATUS_CODE,
+        Constants.FORBIDDEN,
+        Constants.ERROR_MSG_FORBIDDEN_USER
+      );
     }
-  } catch (error) {
-    console.error("Error during login:", error);
-    response = new AuthResponse(Constants.HTTP_SERVER_ERROR_STATUS_CODE, "INTERNAL_SERVER_ERROR", "Internal Server Error");
-    res.status(Constants.HTTP_SERVER_ERROR_STATUS_CODE).json(response);
+  } catch (exception) {
+    // Handle exceptions and log internal server error.
+    logger.exception(Constants.ERROR_MSG_INTERNAL_SERVER_ERROR);
+    response = new AuthResponse(
+      Constants.HTTP_SERVER_ERROR_STATUS_CODE,
+      Constants.INTERNAL_SERVER_ERROR,
+      Constants.ERROR_MSG_INTERNAL_SERVER_ERROR
+    );
   }
+  // Return the response as a JSON object.
+  return res.status(response.statusCode).json(response);
 };
 
 const refreshToken = (req: Request, res: Response): void => {
