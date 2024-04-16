@@ -12,7 +12,7 @@ const getAllUsersService = async (): Promise<UserRenderType[]> => {
 
 const addUserService = async (newUserObject: any) => {
   try {
-    if (null !== newUserObject) {
+    if (newUserObject) {
       const reponseForAdd = await User.create(newUserObject);
       return reponseForAdd;
     } else {
@@ -27,7 +27,7 @@ const addUserService = async (newUserObject: any) => {
 
 const deleteUserService = async (id: string) => {
   try {
-    if (null !== id || undefined !== id) {
+    if (id) {
       const responseForDelete = await User.findByIdAndDelete(id);
       return responseForDelete;
     } else {

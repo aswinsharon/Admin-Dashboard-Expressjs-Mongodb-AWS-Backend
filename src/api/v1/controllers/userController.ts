@@ -1,25 +1,29 @@
-import { Request, Response } from "express";
+import express from "express";
 import bcrypt from "bcryptjs";
 import userServices from "../services/userServices";
 import { UserRenderType } from "../interfaces/types/Types";
 import { validateUserId, validateNewUserObjectFields, validateNewUserObjectValues, } from "../helpers/validationHelpers";
 import { User } from "../models/userSchema";
 import { Constants } from "../../../config/constants";
+import { Response } from "../models/responseModel";
+
 
 /**
  * Retrieves all users from the database.
  * @param {Request} _req - Express request object (unused).
  * @param {Response} res - Express response object.
- * @returns {Promise<Response<any, Record<string, any>>>} Promise representing the result of the operation.
+ * @returns {Promise<express.Response<any, Record<string, any>>>} Promise representing the result of the operation.
  */
-const getUsers = async (_req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+const getUsers = async (_req: express.Request, res: express.Response): Promise<express.Response<any, Record<string, any>>> => {
   try {
     // Retrieve all users from the database.
     const usersFromDB = await userServices.getAllUsersService();
-    console.log(usersFromDB);
-
+    // const getUsersResponse = {
+    //   statusCode: 0,
+    //   users: []
+    // }
     // Check if users are present in the database.
-    if (null !== usersFromDB) {
+    if (usersFromDB) {
       // Map user data to a simplified format.
       const mappedUsers = usersFromDB.map((user: UserRenderType) => ({
         _id: user?._id,
@@ -42,7 +46,8 @@ const getUsers = async (_req: Request, res: Response): Promise<Response<any, Rec
   }
 };
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: express.Request, res: express.Response) => {
+  let response: Response;
   let createUserResponseMessage = {
     statusCode: 0,
     message: "",
@@ -92,59 +97,45 @@ const createUser = async (req: Request, res: Response) => {
         return res.status(Constants.HTTP_CREATED_STATUS_CODE).json(createUserResponseMessage);
       }
     } else {
-      errorMessage.message = "Invalid Request";
-      errorMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
-      errorMessage.invalidFields = validateNewUserObjectValues(newUserObject).invalidFields;
-      return res.status(Constants.HTTP_BAD_REQUEST_STATUS_CODE).json(errorMessage);
+      const invalidFields = validateNewUserObjectValues(newUserObject).invalidFields;
+      response = new Response(Constants.HTTP_BAD_REQUEST_STATUS_CODE, "INVALID_REQUEST", "Invalid Request", undefined, undefined, invalidFields)
+      return res.status(response.statusCode).json(response);
     }
   } catch (error) {
-    console.log("under catch");
-    errorMessage.message = "Internal Server Error";
-    errorMessage.statusCode = Constants.HTTP_SERVER_ERROR_STATUS_CODE;
-    return res.status(Constants.HTTP_SERVER_ERROR_STATUS_CODE).json(errorMessage);
+    response = new Response(Constants.HTTP_SERVER_ERROR_STATUS_CODE, "INTERNAL_SERVER_ERROR", "Internal Server Error")
+    return res.status(response.statusCode).json(response);
   }
 };
 
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = async (req: express.Request, res: express.Response) => {
   let deleteResponseMessage = {
     statusCode: 0,
     message: "",
   };
   try {
     const userId = req?.params?.userId;
-    if (undefined !== userId) {
+    if (userId) {
       if (validateUserId(userId)) {
         const deletedUser = await userServices.deleteUserService(userId);
         if (!deletedUser) {
-          deleteResponseMessage.statusCode =
-            Constants.HTTP_NOT_FOUND_STATUS_CODE;
+          deleteResponseMessage.statusCode = Constants.HTTP_NOT_FOUND_STATUS_CODE;
           deleteResponseMessage.message = "User Not Found";
-          return res
-            .status(Constants.HTTP_NOT_FOUND_STATUS_CODE)
-            .json(deleteResponseMessage);
+          return res.status(Constants.HTTP_NOT_FOUND_STATUS_CODE).json(deleteResponseMessage);
         }
         return res.status(Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE).send();
       } else {
-        deleteResponseMessage.statusCode =
-          Constants.HTTP_BAD_REQUEST_STATUS_CODE;
-        deleteResponseMessage.message = "Invalid Request";
-        return res
-          .status(Constants.HTTP_BAD_REQUEST_STATUS_CODE)
-          .json(deleteResponseMessage);
+        deleteResponseMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE; deleteResponseMessage.message = "Invalid Request";
+        return res.status(Constants.HTTP_BAD_REQUEST_STATUS_CODE).json(deleteResponseMessage);
       }
     } else {
       deleteResponseMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
       deleteResponseMessage.message = "Invalid Request";
-      return res
-        .status(Constants.HTTP_BAD_REQUEST_STATUS_CODE)
-        .json(deleteResponseMessage);
+      return res.status(Constants.HTTP_BAD_REQUEST_STATUS_CODE).json(deleteResponseMessage);
     }
   } catch (error) {
     deleteResponseMessage.statusCode = Constants.HTTP_SERVER_ERROR_STATUS_CODE;
     deleteResponseMessage.message = "Internal Server Error";
-    return res
-      .status(Constants.HTTP_SERVER_ERROR_STATUS_CODE)
-      .json(deleteResponseMessage);
+    return res.status(Constants.HTTP_SERVER_ERROR_STATUS_CODE).json(deleteResponseMessage);
   }
 };
 

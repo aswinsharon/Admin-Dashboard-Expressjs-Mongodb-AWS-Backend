@@ -1,9 +1,10 @@
 import mongoose, { ConnectOptions, Connection } from "mongoose";
 import { EventEmitter } from "events";
+
 const MONGO_URI = process.env.MONGO_URI as string;
 
 class DatabaseConfig extends EventEmitter {
-  RETRY_COUNT = 0;
+  RETRY_COUNT = 1;
   MAX_COUNT = 3;
 
   private dbConnection: Connection | null = null;
@@ -12,24 +13,29 @@ class DatabaseConfig extends EventEmitter {
     const options: ConnectOptions = {
       autoIndex: false,
       maxPoolSize: 10,
+      connectTimeoutMS: 10000, // Example: 10 seconds connection timeout
     };
     try {
       await mongoose.connect(MONGO_URI, options);
       this.dbConnection = mongoose.connection;
       this.emit("connected", this.dbConnection);
-    } catch (exception: any) {
-      if (this.RETRY_COUNT < this.MAX_COUNT) {
-        console.error("connection unsucessful, retrying...", exception);
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (error: any) {
+      if (this.isNetworkError(error) && this.RETRY_COUNT <= this.MAX_COUNT) {
+        console.error(`Network error occurred, retrying for ${this.RETRY_COUNT} time`, error);
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+        this.RETRY_COUNT++;
         await this.connect();
       } else {
-        this.RETRY_COUNT = 0;
-        console.error("Maximum retries reached closing connection");
+        console.error("Maximum retries reached or non-network error, closing connection", error);
         await this.closeConnection();
         process.exit();
       }
     }
   };
+
+  private isNetworkError(error: any): boolean {
+    return error?.code === "ETIMEOUT";
+  }
 
   private async closeConnection(): Promise<void> {
     if (this.dbConnection) {

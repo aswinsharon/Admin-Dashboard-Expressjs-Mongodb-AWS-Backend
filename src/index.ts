@@ -7,15 +7,17 @@ dotenv.config();
 
 import databaseConfig from "./config/DatabaseConfig";
 import router from "./api/v1/routes/router";
-
 const app = express();
 const PORT = 8080;
 
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
-app.use(cookieParser())
+app.use(cors({
+  origin: 'http://localhost:6001',
+  credentials: true,
+}));
+app.use(cookieParser());
 
 //routes
 app.use("/api/v1", router);
