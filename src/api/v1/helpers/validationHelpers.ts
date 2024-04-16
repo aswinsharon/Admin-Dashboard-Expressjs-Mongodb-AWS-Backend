@@ -6,7 +6,7 @@ import { validationObject } from "../interfaces/types/Types";
  * @returns {boolean}
  */
 
-function validateUserId(userId: string) {
+function validateUserId(userId: string): boolean {
   const pattern = /^[0-9a-fA-F]{24}$/;
   return pattern.test(userId);
 }
@@ -28,7 +28,6 @@ function validateNewUserObjectFields(newUserObject: any): boolean {
     "img",
   ];
   const isValid = requiredFields.every((field) => newUserObject[field]);
-  console.log("valid in fields", isValid);
   return isValid;
 }
 

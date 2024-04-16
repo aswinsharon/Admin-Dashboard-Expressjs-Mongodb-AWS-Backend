@@ -1,0 +1,18 @@
+query GetPayments {
+  payments(limit: 6) {
+    results {
+      id
+      amountPlanned {
+        centAmount
+        currencyCode
+      }
+      paymentMethodInfo {
+        paymentInterface
+      }
+      status {
+        interfaceCode
+        state
+      }
+    }
+  }
+}

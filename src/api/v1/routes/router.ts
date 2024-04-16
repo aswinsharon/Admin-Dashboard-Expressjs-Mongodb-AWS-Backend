@@ -5,7 +5,6 @@ import authenticateToken from "../middlewares/authMiddleWare";
 
 const router = express.Router();
 
-router.post("/register", loginController.register);
 router.post("/login", loginController.login);
 router.post("/refresh-token", loginController.refreshToken);
 
