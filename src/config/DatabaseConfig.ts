@@ -13,7 +13,7 @@ class DatabaseConfig extends EventEmitter {
     const options: ConnectOptions = {
       autoIndex: false,
       maxPoolSize: 10,
-      connectTimeoutMS: 10000, // Example: 10 seconds connection timeout
+      connectTimeoutMS: 2000,
     };
     try {
       await mongoose.connect(MONGO_URI, options);

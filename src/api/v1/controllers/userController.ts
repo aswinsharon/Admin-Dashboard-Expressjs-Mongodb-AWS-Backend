@@ -14,17 +14,11 @@ import { Response } from "../models/responseModel";
  * @param {Response} res - Express response object.
  * @returns {Promise<express.Response<any, Record<string, any>>>} Promise representing the result of the operation.
  */
+
 const getUsers = async (_req: express.Request, res: express.Response): Promise<express.Response<any, Record<string, any>>> => {
   try {
-    // Retrieve all users from the database.
     const usersFromDB = await userServices.getAllUsersService();
-    // const getUsersResponse = {
-    //   statusCode: 0,
-    //   users: []
-    // }
-    // Check if users are present in the database.
     if (usersFromDB) {
-      // Map user data to a simplified format.
       const mappedUsers = usersFromDB.map((user: UserRenderType) => ({
         _id: user?._id,
         username: user?.username,
@@ -37,7 +31,6 @@ const getUsers = async (_req: express.Request, res: express.Response): Promise<e
       }));
       return res.status(Constants.HTTP_OK_STATUS_CODE).json(mappedUsers);
     } else {
-      // Return an empty array if no users are found.
       return res.status(Constants.HTTP_OK_STATUS_CODE).json([]);
     }
   } catch (error: any) {
@@ -69,11 +62,11 @@ const createUser = async (req: express.Request, res: express.Response) => {
     isActive: false,
   };
   try {
-    let newUserObject = req.body;
+    let newUserObject = req?.body;
     if (validateNewUserObjectFields(newUserObject) && validateNewUserObjectValues(newUserObject)?.isValid) {
       const existingUser = await User.findOne({ $or: [{ username: newUserObject.username }, { email: newUserObject.email },], });
       if (existingUser) {
-        errorMessage.message = "Username or email is already taken";
+        errorMessage.message = Constants.ERROR_CONFLICT_USER_NAME;
         errorMessage.statusCode = Constants.HTTP_CONFLICT_STATUS_CODE;
         return res.status(Constants.HTTP_CONFLICT_STATUS_CODE).json(errorMessage);
       } else {
@@ -92,7 +85,7 @@ const createUser = async (req: express.Request, res: express.Response) => {
         }
         const user = await userServices.addUserService(userInsertionObject);
         createUserResponseMessage.statusCode = Constants.HTTP_CREATED_STATUS_CODE;
-        createUserResponseMessage.message = "User Created Successfully";
+        createUserResponseMessage.message = Constants.SUCCESS_MSG_USER_CREATE;
         createUserResponseMessage.userDetails = user;
         return res.status(Constants.HTTP_CREATED_STATUS_CODE).json(createUserResponseMessage);
       }
@@ -119,22 +112,23 @@ const deleteUser = async (req: express.Request, res: express.Response) => {
         const deletedUser = await userServices.deleteUserService(userId);
         if (!deletedUser) {
           deleteResponseMessage.statusCode = Constants.HTTP_NOT_FOUND_STATUS_CODE;
-          deleteResponseMessage.message = "User Not Found";
+          deleteResponseMessage.message = Constants.ERROR_MSG_USER_NOT_FOUND;
           return res.status(Constants.HTTP_NOT_FOUND_STATUS_CODE).json(deleteResponseMessage);
         }
         return res.status(Constants.HTTP_SUCCESS_NO_CONTENT_STATUS_CODE).send();
       } else {
-        deleteResponseMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE; deleteResponseMessage.message = "Invalid Request";
+        deleteResponseMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
+        deleteResponseMessage.message = Constants.ERROR_MSG_INVALID_REQUEST;
         return res.status(Constants.HTTP_BAD_REQUEST_STATUS_CODE).json(deleteResponseMessage);
       }
     } else {
       deleteResponseMessage.statusCode = Constants.HTTP_BAD_REQUEST_STATUS_CODE;
-      deleteResponseMessage.message = "Invalid Request";
+      deleteResponseMessage.message = Constants.ERROR_MSG_INVALID_REQUEST;
       return res.status(Constants.HTTP_BAD_REQUEST_STATUS_CODE).json(deleteResponseMessage);
     }
   } catch (error) {
     deleteResponseMessage.statusCode = Constants.HTTP_SERVER_ERROR_STATUS_CODE;
-    deleteResponseMessage.message = "Internal Server Error";
+    deleteResponseMessage.message = Constants.ERROR_MSG_INTERNAL_SERVER_ERROR;
     return res.status(Constants.HTTP_SERVER_ERROR_STATUS_CODE).json(deleteResponseMessage);
   }
 };

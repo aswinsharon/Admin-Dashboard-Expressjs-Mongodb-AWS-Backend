@@ -5,8 +5,9 @@ export class Response {
     accessToken?: string;
     refreshToken?: string;
     invalidFields?: string[];
+    response: any;
 
-    constructor(statusCode: number, status: string, message: string, accessToken?: string, refreshToken?: string, invalidFields?: string[]) {
+    constructor(statusCode: number, status: string, message: string, accessToken?: string, refreshToken?: string, invalidFields?: string[], response?: any) {
         this.statusCode = statusCode;
         this.status = status;
         this.message = message;
@@ -18,6 +19,9 @@ export class Response {
         }
         if (invalidFields) {
             this.invalidFields = invalidFields;
+        }
+        if (response) {
+            this.response = response;
         }
     }
 }
