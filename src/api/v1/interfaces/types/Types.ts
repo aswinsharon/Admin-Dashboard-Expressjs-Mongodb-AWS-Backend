@@ -34,3 +34,11 @@ export interface UserAuthType {
   username: string;
   password: string;
 }
+
+export interface TransactionDataType {
+  name: string,
+  transactionStatus: string,
+  dateOfTransaction: string,
+  amount: number,
+  paymentStatus: string
+}

@@ -7,3 +7,12 @@ export const generateAccessToken = (id: any): string => {
 export const generateRefreshToken = (id: any): string => {
   return jwt.sign({ id }, process.env.REFRESH_TOKEN_SECRET!);
 };
+
+export const convertToAmount = (centAmount: number, fractionDigits: number): number | null => {
+  let formattedAmount = null;
+  if (centAmount && typeof centAmount === 'number' && fractionDigits && typeof fractionDigits === 'number') {
+    const amount = centAmount / 100;
+    formattedAmount = parseFloat(amount.toFixed(fractionDigits));
+  }
+  return formattedAmount;
+}

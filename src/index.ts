@@ -7,6 +7,7 @@ dotenv.config();
 
 import databaseConfig from "./config/DatabaseConfig";
 import router from "./api/v1/routes/router";
+
 const app = express();
 const PORT = 8080;
 
